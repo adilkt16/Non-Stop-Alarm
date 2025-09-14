@@ -1,0 +1,4 @@
+# Placeholder for alarm sound
+# You need to add an actual alarm sound file here
+# Example: alarm_sound.mp3 or alarm_sound.ogg
+# This file should be placed in the raw directory

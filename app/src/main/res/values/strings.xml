@@ -1,0 +1,41 @@
+<resources>
+    <string name="app_name">NonStop Alarm</string>
+    
+    <!-- Main Activity -->
+    <string name="alarm_start_time">Alarm Start Time</string>
+    <string name="alarm_end_time">Alarm End Time</string>
+    <string name="select_start_time">Select Start Time</string>
+    <string name="select_end_time">Select End Time</string>
+    <string name="set_alarm">SET ALARM</string>
+    <string name="cancel_alarm">Cancel Alarm</string>
+    <string name="no_alarm_set">No alarm set</string>
+    <string name="not_set">Not set</string>
+    
+    <!-- Descriptions -->
+    <string name="app_description">Persistent alarm that requires solving a math puzzle to dismiss</string>
+    <string name="important_warning">⚠️ IMPORTANT: This alarm will play continuously until you solve a math puzzle or the end time is reached. Make sure to set an appropriate end time.</string>
+    
+    <!-- Alarm Activity -->
+    <string name="alarm_active">🚨 ALARM ACTIVE 🚨</string>
+    <string name="solve_math_problem">Solve this math problem to dismiss the alarm:</string>
+    <string name="your_answer">Your answer</string>
+    <string name="submit_answer">SUBMIT ANSWER</string>
+    <string name="clear">C</string>
+    <string name="backspace">⌫</string>
+    
+    <!-- Messages -->
+    <string name="alarm_set_success">Alarm set successfully!</string>
+    <string name="alarm_cancelled">Alarm cancelled</string>
+    <string name="set_both_times">Please set both start and end times</string>
+    <string name="end_time_after_start">End time must be after start time</string>
+    <string name="duration_too_long">Alarm duration cannot exceed 12 hours</string>
+    <string name="enter_answer">Please enter an answer</string>
+    <string name="correct_answer">Correct! Alarm dismissed.</string>
+    <string name="incorrect_answer">Incorrect. Try again with a new problem.</string>
+    <string name="enter_valid_number">Please enter a valid number</string>
+    <string name="solve_to_dismiss">Solve the math problem to dismiss the alarm</string>
+    
+    <!-- Notification -->
+    <string name="alarm_notification_title">NonStop Alarm Active</string>
+    <string name="alarm_notification_text">Tap to solve math puzzle and dismiss alarm</string>
+</resources>

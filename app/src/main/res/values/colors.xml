@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    
+    <!-- App specific colors -->
+    <color name="primary_text">#FF212121</color>
+    <color name="secondary_text">#FF757575</color>
+    <color name="warning_text">#FFF57C00</color>
+    <color name="hint_text">#FFBDBDBD</color>
+    
+    <!-- Alarm activity colors -->
+    <color name="alarm_background">#FFFF5722</color>
+    <color name="alarm_text">#FFFFFFFF</color>
+    <color name="alarm_text_secondary">#FFFCE4EC</color>
+    
+    <!-- Button colors -->
+    <color name="number_button_bg">#FF2196F3</color>
+    <color name="action_button_bg">#FFFF9800</color>
+    <color name="submit_button_bg">#FF4CAF50</color>
+    
+    <!-- Background colors -->
+    <color name="time_display_bg">#FFF5F5F5</color>
+    <color name="warning_bg">#FFFFF3E0</color>
+    <color name="math_problem_bg">#FFFFFF</color>
+    <color name="answer_input_bg">#FFFFFF</color>
+</resources>

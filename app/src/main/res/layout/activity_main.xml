@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res/auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp">
+
+        <!-- App Title -->
+        <TextView
+            android:id="@+id/tvAppTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="NonStop Alarm"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:textAlignment="center"
+            android:textColor="@color/primary_text"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="8dp" />
+
+        <!-- App Description -->
+        <TextView
+            android:id="@+id/tvAppDescription"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Persistent alarm that requires solving a math puzzle to dismiss"
+            android:textSize="16sp"
+            android:textAlignment="center"
+            android:textColor="@color/secondary_text"
+            app:layout_constraintTop_toBottomOf="@id/tvAppTitle"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="32dp" />
+
+        <!-- Start Time Section -->
+        <TextView
+            android:id="@+id/tvStartTimeLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Alarm Start Time"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary_text"
+            app:layout_constraintTop_toBottomOf="@id/tvAppDescription"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tvStartTime"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:text="Not set"
+            android:textSize="20sp"
+            android:textAlignment="center"
+            android:background="@drawable/time_display_background"
+            android:gravity="center"
+            android:textColor="@color/primary_text"
+            app:layout_constraintTop_toBottomOf="@id/tvStartTimeLabel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btnSelectStartTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Select Start Time"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/tvStartTime"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="24dp" />
+
+        <!-- End Time Section -->
+        <TextView
+            android:id="@+id/tvEndTimeLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Alarm End Time"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary_text"
+            app:layout_constraintTop_toBottomOf="@id/btnSelectStartTime"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tvEndTime"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:text="Not set"
+            android:textSize="20sp"
+            android:textAlignment="center"
+            android:background="@drawable/time_display_background"
+            android:gravity="center"
+            android:textColor="@color/primary_text"
+            app:layout_constraintTop_toBottomOf="@id/tvEndTimeLabel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/btnSelectEndTime"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Select End Time"
+            android:textSize="16sp"
+            app:layout_constraintTop_toBottomOf="@id/tvEndTime"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="32dp" />
+
+        <!-- Alarm Control Buttons -->
+        <Button
+            android:id="@+id/btnSetAlarm"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:text="SET ALARM"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:enabled="false"
+            app:layout_constraintTop_toBottomOf="@id/btnSelectEndTime"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btnCancelAlarm"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:text="Cancel Alarm"
+            android:textSize="16sp"
+            android:enabled="false"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            app:layout_constraintTop_toBottomOf="@id/btnSetAlarm"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="24dp" />
+
+        <!-- Alarm Status -->
+        <TextView
+            android:id="@+id/tvAlarmStatus"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="No alarm set"
+            android:textSize="16sp"
+            android:textAlignment="center"
+            android:textColor="@color/secondary_text"
+            app:layout_constraintTop_toBottomOf="@id/btnCancelAlarm"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="16dp" />
+
+        <!-- Important Note -->
+        <TextView
+            android:id="@+id/tvImportantNote"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="⚠️ IMPORTANT: This alarm will play continuously until you solve a math puzzle or the end time is reached. Make sure to set an appropriate end time."
+            android:textSize="14sp"
+            android:textAlignment="center"
+            android:textColor="@color/warning_text"
+            android:background="@drawable/warning_background"
+            android:padding="16dp"
+            app:layout_constraintTop_toBottomOf="@id/tvAlarmStatus"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<data-extraction-rules>
+    <cloud-backup>
+        <!-- Exclude alarm settings from cloud backup for security -->
+        <exclude domain="sharedpref" path="alarm_prefs"/>
+    </cloud-backup>
+    <!--
+        Consider declaring a device-transfer rule as well to control what data
+        you want to be included when a user's device is transferred.
+    -->
+    <device-transfer>
+        <exclude domain="sharedpref" path="alarm_prefs"/>
+    </device-transfer>
+</data-extraction-rules>
