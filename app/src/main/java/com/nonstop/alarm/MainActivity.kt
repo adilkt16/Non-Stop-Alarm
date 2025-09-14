@@ -91,6 +91,12 @@ class MainActivity : AppCompatActivity() {
         // Update button states
         binding.btnSetAlarm.isEnabled = state.canCreateAlarm && !state.isLoading
         
+        // Update duration display
+        updateDurationDisplay(state)
+        
+        // Update validation messages
+        updateValidationDisplay(state)
+        
         // Show loading
         if (state.isLoading) {
             // Could add progress indicator here
@@ -106,10 +112,34 @@ class MainActivity : AppCompatActivity() {
             Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
             viewModel.clearMessage()
         }
-        
+    }
+    
+    private fun updateDurationDisplay(state: com.nonstop.alarm.ui.main.MainUiState) {
+        if (state.startTime != null && state.endTime != null && state.validationError == null) {
+            val durationMillis = state.endTime - state.startTime
+            val hours = durationMillis / (1000 * 60 * 60)
+            val minutes = (durationMillis % (1000 * 60 * 60)) / (1000 * 60)
+            
+            binding.tvDurationLabel.visibility = android.view.View.VISIBLE
+            binding.tvDuration.visibility = android.view.View.VISIBLE
+            binding.tvDuration.text = when {
+                hours > 0 && minutes > 0 -> "${hours}h ${minutes}m"
+                hours > 0 -> "${hours}h"
+                minutes > 0 -> "${minutes}m"
+                else -> "Less than 1 minute"
+            }
+        } else {
+            binding.tvDurationLabel.visibility = android.view.View.GONE
+            binding.tvDuration.visibility = android.view.View.GONE
+        }
+    }
+    
+    private fun updateValidationDisplay(state: com.nonstop.alarm.ui.main.MainUiState) {
         state.validationError?.let { error ->
-            // Show validation error in a less intrusive way
-            binding.tvAlarmStatus.text = error
+            binding.tvValidationMessage.visibility = android.view.View.VISIBLE
+            binding.tvValidationMessage.text = error
+        } ?: run {
+            binding.tvValidationMessage.visibility = android.view.View.GONE
         }
     }
     

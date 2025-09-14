@@ -1,6 +1,7 @@
 package com.nonstop.alarm.data.repository
 
 import androidx.lifecycle.LiveData
+import com.nonstop.alarm.BuildConfig
 import com.nonstop.alarm.data.database.AlarmDao
 import com.nonstop.alarm.data.database.MathPuzzleDao
 import com.nonstop.alarm.data.model.*
@@ -167,9 +168,16 @@ class AlarmRepositoryImpl @Inject constructor(
         return try {
             val currentTime = System.currentTimeMillis()
             
-            // Start time cannot be in the past
-            if (startTime <= currentTime) {
-                return Result.failure(Exception("Start time cannot be in the past"))
+            // Get debug-configurable minimum time until start
+            val minTimeUntilStart = if (BuildConfig.DEBUG_MODE) {
+                BuildConfig.MIN_TIME_UNTIL_START_MS
+            } else {
+                60 * 1000L // 1 minute in production
+            }
+            
+            // Start time must be in the future with minimum buffer
+            if (startTime <= currentTime + minTimeUntilStart) {
+                return Result.failure(Exception("Start time must be at least ${minTimeUntilStart / 1000} seconds in the future"))
             }
             
             // End time must be after start time
@@ -184,10 +192,15 @@ class AlarmRepositoryImpl @Inject constructor(
                 return Result.failure(Exception("Alarm duration cannot exceed 12 hours"))
             }
             
-            // Minimum duration should be at least 1 minute
-            val minDuration = 60 * 1000L // 1 minute
+            // Get debug-configurable minimum duration
+            val minDuration = if (BuildConfig.DEBUG_MODE) {
+                BuildConfig.MIN_ALARM_DURATION_MS
+            } else {
+                60 * 1000L // 1 minute in production
+            }
+            
             if (duration < minDuration) {
-                return Result.failure(Exception("Alarm duration must be at least 1 minute"))
+                return Result.failure(Exception("Alarm duration must be at least ${minDuration / 1000} seconds"))
             }
             
             Result.success(Unit)

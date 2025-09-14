@@ -20,12 +20,35 @@ android {
     }
 
     buildTypes {
+        debug {
+            isDebuggable = true
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+            manifestPlaceholders["appName"] = "NonStop Alarm Debug"
+            
+            // Enable debug logging
+            buildConfigField("boolean", "DEBUG_MODE", "true")
+            buildConfigField("String", "BUILD_TYPE", "\"debug\"")
+            
+            // Faster alarm testing - reduce minimum durations
+            buildConfigField("long", "MIN_ALARM_DURATION_MS", "10000L") // 10 seconds for testing
+            buildConfigField("long", "MIN_TIME_UNTIL_START_MS", "5000L") // 5 seconds for testing
+        }
+        
         release {
             isMinifyEnabled = false
+            manifestPlaceholders["appName"] = "NonStop Alarm"
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            
+            buildConfigField("boolean", "DEBUG_MODE", "false")
+            buildConfigField("String", "BUILD_TYPE", "\"release\"")
+            
+            // Production timing constraints
+            buildConfigField("long", "MIN_ALARM_DURATION_MS", "60000L") // 1 minute minimum
+            buildConfigField("long", "MIN_TIME_UNTIL_START_MS", "60000L") // 1 minute minimum
         }
     }
     
@@ -40,6 +63,7 @@ android {
     
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 }
 

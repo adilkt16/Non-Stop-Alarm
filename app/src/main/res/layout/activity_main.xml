@@ -31,7 +31,7 @@
             android:id="@+id/tvAppDescription"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Persistent alarm that requires solving a math puzzle to dismiss"
+            android:text="Set a time window when the alarm will be active. Dismiss by solving math puzzles."
             android:textSize="16sp"
             android:textAlignment="center"
             android:textColor="@color/secondary_text"
@@ -118,7 +118,57 @@
             app:layout_constraintTop_toBottomOf="@id/tvEndTime"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="32dp" />
+            android:layout_marginBottom="16dp" />
+
+        <!-- Duration Display Section -->
+        <TextView
+            android:id="@+id/tvDurationLabel"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Alarm Duration"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="@color/primary_text"
+            android:textAlignment="center"
+            app:layout_constraintTop_toBottomOf="@id/btnSelectEndTime"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="8dp"
+            android:visibility="gone" />
+
+        <TextView
+            android:id="@+id/tvDuration"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="18sp"
+            android:textAlignment="center"
+            android:textColor="@color/success_text"
+            android:textStyle="bold"
+            android:background="@drawable/duration_background"
+            android:padding="12dp"
+            app:layout_constraintTop_toBottomOf="@id/tvDurationLabel"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone" />
+
+        <!-- Validation Messages -->
+        <TextView
+            android:id="@+id/tvValidationMessage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text=""
+            android:textSize="14sp"
+            android:textAlignment="center"
+            android:textColor="@color/error_text"
+            android:background="@drawable/error_background"
+            android:padding="12dp"
+            app:layout_constraintTop_toBottomOf="@id/tvDuration"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="16dp"
+            android:visibility="gone" />
 
         <!-- Alarm Control Buttons -->
         <Button
@@ -129,7 +179,7 @@
             android:textSize="18sp"
             android:textStyle="bold"
             android:enabled="false"
-            app:layout_constraintTop_toBottomOf="@id/btnSelectEndTime"
+            app:layout_constraintTop_toBottomOf="@id/tvValidationMessage"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="16dp" />
@@ -166,7 +216,7 @@
             android:id="@+id/tvImportantNote"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="⚠️ IMPORTANT: This alarm will play continuously until you solve a math puzzle or the end time is reached. Make sure to set an appropriate end time."
+            android:text="⚠️ Time-Bounded Operation: This alarm will play continuously from START time until END time. It can only be stopped by solving a math puzzle or when the end time is reached. Please set both times carefully."
             android:textSize="14sp"
             android:textAlignment="center"
             android:textColor="@color/warning_text"

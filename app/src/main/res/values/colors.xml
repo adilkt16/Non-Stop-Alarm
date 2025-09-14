@@ -29,4 +29,13 @@
     <color name="warning_bg">#FFFFF3E0</color>
     <color name="math_problem_bg">#FFFFFF</color>
     <color name="answer_input_bg">#FFFFFF</color>
+    
+    <!-- Status and feedback colors -->
+    <color name="success_text">#FF2E7D32</color>
+    <color name="success_background">#FFE8F5E8</color>
+    <color name="success_border">#FF4CAF50</color>
+    
+    <color name="error_text">#FFD32F2F</color>
+    <color name="error_background">#FFFDEAEA</color>
+    <color name="error_border">#FFF44336</color>
 </resources>

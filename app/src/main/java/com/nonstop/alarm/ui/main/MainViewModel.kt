@@ -207,15 +207,47 @@ class MainViewModel @Inject constructor(
         if (startTime != null && endTime != null) {
             viewModelScope.launch {
                 val validation = alarmRepository.validateAlarmTimes(startTime, endTime)
+                
+                val validationMessage = when {
+                    validation.isFailure -> {
+                        val error = validation.exceptionOrNull()?.message
+                        when {
+                            error?.contains("before current time") == true -> 
+                                "⚠️ Start time must be in the future"
+                            error?.contains("after end time") == true -> 
+                                "⚠️ End time must be after start time"
+                            error?.contains("too short") == true -> 
+                                "⚠️ Alarm duration must be at least 1 minute"
+                            else -> "⚠️ Invalid time configuration"
+                        }
+                    }
+                    else -> null
+                }
+                
                 val canCreate = if (validation.isSuccess) {
-                    alarmRepository.canCreateAlarm(startTime, endTime).getOrDefault(false)
+                    val canCreateResult = alarmRepository.canCreateAlarm(startTime, endTime)
+                    if (canCreateResult.isFailure) {
+                        val canCreateError = canCreateResult.exceptionOrNull()?.message
+                        _uiState.value = _uiState.value.copy(
+                            canCreateAlarm = false,
+                            validationError = when {
+                                canCreateError?.contains("overlaps") == true -> 
+                                    "⚠️ This time conflicts with an existing alarm"
+                                canCreateError?.contains("active alarm") == true -> 
+                                    "⚠️ Please cancel the current alarm first"
+                                else -> "⚠️ Cannot create alarm at this time"
+                            }
+                        )
+                        return@launch
+                    }
+                    canCreateResult.getOrDefault(false)
                 } else {
                     false
                 }
                 
                 _uiState.value = _uiState.value.copy(
                     canCreateAlarm = canCreate,
-                    validationError = if (validation.isFailure) validation.exceptionOrNull()?.message else null
+                    validationError = validationMessage
                 )
             }
         } else {
