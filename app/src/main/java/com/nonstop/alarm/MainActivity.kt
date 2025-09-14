@@ -4,18 +4,25 @@ import android.app.TimePickerDialog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.nonstop.alarm.databinding.ActivityMainBinding
 import com.nonstop.alarm.service.AlarmService
+import com.nonstop.alarm.ui.main.MainViewModel
 import com.nonstop.alarm.util.AlarmManager
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     
     private lateinit var binding: ActivityMainBinding
-    private var startTime: Calendar? = null
-    private var endTime: Calendar? = null
+    private val viewModel: MainViewModel by viewModels()
     private val timeFormat = SimpleDateFormat("HH:mm", Locale.getDefault())
     
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,12 +32,10 @@ class MainActivity : AppCompatActivity() {
         
         setupUI()
         setupClickListeners()
+        observeViewModel()
     }
     
     private fun setupUI() {
-        // Initialize time displays
-        updateTimeDisplays()
-        
         // Set app title
         supportActionBar?.title = "NonStop Alarm"
     }
@@ -45,11 +50,66 @@ class MainActivity : AppCompatActivity() {
         }
         
         binding.btnSetAlarm.setOnClickListener {
-            setAlarm()
+            viewModel.createAlarm()
         }
         
         binding.btnCancelAlarm.setOnClickListener {
-            cancelAlarm()
+            viewModel.activeAlarm.value?.let { alarm ->
+                viewModel.cancelAlarm(alarm.id)
+            }
+        }
+    }
+    
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    updateUI(state)
+                }
+            }
+        }
+        
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.activeAlarm.collect { alarm ->
+                    binding.btnCancelAlarm.isEnabled = alarm != null
+                    binding.tvAlarmStatus.text = if (alarm != null) {
+                        "Active alarm: ${timeFormat.format(Date(alarm.startTime))}"
+                    } else {
+                        "No alarm set"
+                    }
+                }
+            }
+        }
+    }
+    
+    private fun updateUI(state: com.nonstop.alarm.ui.main.MainUiState) {
+        // Update time displays
+        binding.tvStartTime.text = state.startTimeDisplay
+        binding.tvEndTime.text = state.endTimeDisplay
+        
+        // Update button states
+        binding.btnSetAlarm.isEnabled = state.canCreateAlarm && !state.isLoading
+        
+        // Show loading
+        if (state.isLoading) {
+            // Could add progress indicator here
+        }
+        
+        // Show messages
+        state.error?.let { error ->
+            Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
+            viewModel.clearError()
+        }
+        
+        state.message?.let { message ->
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+            viewModel.clearMessage()
+        }
+        
+        state.validationError?.let { error ->
+            // Show validation error in a less intrusive way
+            binding.tvAlarmStatus.text = error
         }
     }
     
@@ -72,85 +132,11 @@ class MainActivity : AppCompatActivity() {
             }
             
             if (isStartTime) {
-                startTime = selectedTime
+                viewModel.setStartTime(selectedTime.timeInMillis)
             } else {
-                endTime = selectedTime
+                viewModel.setEndTime(selectedTime.timeInMillis)
             }
-            
-            updateTimeDisplays()
-            validateTimes()
             
         }, hour, minute, true).show()
-    }
-    
-    private fun updateTimeDisplays() {
-        binding.tvStartTime.text = startTime?.let { timeFormat.format(it.time) } ?: "Not set"
-        binding.tvEndTime.text = endTime?.let { timeFormat.format(it.time) } ?: "Not set"
-    }
-    
-    private fun validateTimes() {
-        val startTimeVal = startTime
-        val endTimeVal = endTime
-        
-        if (startTimeVal != null && endTimeVal != null) {
-            if (endTimeVal.timeInMillis <= startTimeVal.timeInMillis) {
-                // If end time is before or equal to start time, set it to next day
-                endTimeVal.add(Calendar.DAY_OF_MONTH, 1)
-                updateTimeDisplays()
-            }
-        }
-        
-        // Enable/disable set alarm button
-        binding.btnSetAlarm.isEnabled = startTimeVal != null && endTimeVal != null
-    }
-    
-    private fun setAlarm() {
-        val startTimeVal = startTime
-        val endTimeVal = endTime
-        
-        if (startTimeVal == null || endTimeVal == null) {
-            Toast.makeText(this, "Please set both start and end times", Toast.LENGTH_SHORT).show()
-            return
-        }
-        
-        // Validate that end time is after start time
-        if (endTimeVal.timeInMillis <= startTimeVal.timeInMillis) {
-            Toast.makeText(this, "End time must be after start time", Toast.LENGTH_SHORT).show()
-            return
-        }
-        
-        // Calculate duration
-        val durationMs = endTimeVal.timeInMillis - startTimeVal.timeInMillis
-        val durationMinutes = durationMs / (1000 * 60)
-        
-        if (durationMinutes > 12 * 60) { // More than 12 hours
-            Toast.makeText(this, "Alarm duration cannot exceed 12 hours", Toast.LENGTH_SHORT).show()
-            return
-        }
-        
-        // Schedule the alarm
-        AlarmManager.scheduleAlarm(this, startTimeVal.timeInMillis, endTimeVal.timeInMillis)
-        
-        Toast.makeText(this, "Alarm set successfully!", Toast.LENGTH_SHORT).show()
-        
-        // Update UI
-        binding.btnSetAlarm.isEnabled = false
-        binding.btnCancelAlarm.isEnabled = true
-        binding.tvAlarmStatus.text = "Alarm scheduled for ${timeFormat.format(startTimeVal.time)}"
-    }
-    
-    private fun cancelAlarm() {
-        AlarmManager.cancelAlarm(this)
-        
-        // Stop alarm service if running
-        val intent = Intent(this, AlarmService::class.java)
-        stopService(intent)
-        
-        Toast.makeText(this, "Alarm cancelled", Toast.LENGTH_SHORT).show()
-        
-        // Update UI
-        binding.btnSetAlarm.isEnabled = true
-        binding.btnCancelAlarm.isEnabled = false
-        binding.tvAlarmStatus.text = "No alarm set"
     }
 }

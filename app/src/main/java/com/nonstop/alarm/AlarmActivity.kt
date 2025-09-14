@@ -4,16 +4,22 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.nonstop.alarm.databinding.ActivityAlarmBinding
 import com.nonstop.alarm.service.AlarmService
-import kotlin.random.Random
+import com.nonstop.alarm.ui.alarm.AlarmViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
 
+@AndroidEntryPoint
 class AlarmActivity : AppCompatActivity() {
     
     private lateinit var binding: ActivityAlarmBinding
-    private var currentAnswer: Int = 0
-    private var endTime: Long = 0
+    private val viewModel: AlarmViewModel by viewModels()
     
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,112 +39,85 @@ class AlarmActivity : AppCompatActivity() {
         binding = ActivityAlarmBinding.inflate(layoutInflater)
         setContentView(binding.root)
         
-        endTime = intent.getLongExtra(AlarmService.EXTRA_END_TIME, 0)
+        val alarmId = intent.getLongExtra("ALARM_ID", -1L).takeIf { it != -1L }
+        val endTime = intent.getLongExtra(AlarmService.EXTRA_END_TIME, 0).takeIf { it != 0L }
         
-        setupUI()
-        generateMathProblem()
+        viewModel.initializeAlarm(alarmId, endTime)
+        
         setupClickListeners()
-    }
-    
-    private fun setupUI() {
-        // Display end time
-        if (endTime > 0) {
-            val endTimeFormatted = java.text.SimpleDateFormat("HH:mm", java.util.Locale.getDefault())
-                .format(java.util.Date(endTime))
-            binding.tvEndTime.text = "Alarm will stop automatically at $endTimeFormatted"
-        }
+        observeViewModel()
     }
     
     private fun setupClickListeners() {
         // Number buttons
-        binding.btn0.setOnClickListener { appendDigit("0") }
-        binding.btn1.setOnClickListener { appendDigit("1") }
-        binding.btn2.setOnClickListener { appendDigit("2") }
-        binding.btn3.setOnClickListener { appendDigit("3") }
-        binding.btn4.setOnClickListener { appendDigit("4") }
-        binding.btn5.setOnClickListener { appendDigit("5") }
-        binding.btn6.setOnClickListener { appendDigit("6") }
-        binding.btn7.setOnClickListener { appendDigit("7") }
-        binding.btn8.setOnClickListener { appendDigit("8") }
-        binding.btn9.setOnClickListener { appendDigit("9") }
+        binding.btn0.setOnClickListener { viewModel.appendDigit("0") }
+        binding.btn1.setOnClickListener { viewModel.appendDigit("1") }
+        binding.btn2.setOnClickListener { viewModel.appendDigit("2") }
+        binding.btn3.setOnClickListener { viewModel.appendDigit("3") }
+        binding.btn4.setOnClickListener { viewModel.appendDigit("4") }
+        binding.btn5.setOnClickListener { viewModel.appendDigit("5") }
+        binding.btn6.setOnClickListener { viewModel.appendDigit("6") }
+        binding.btn7.setOnClickListener { viewModel.appendDigit("7") }
+        binding.btn8.setOnClickListener { viewModel.appendDigit("8") }
+        binding.btn9.setOnClickListener { viewModel.appendDigit("9") }
         
         // Action buttons
-        binding.btnClear.setOnClickListener { clearAnswer() }
-        binding.btnBackspace.setOnClickListener { backspace() }
-        binding.btnSubmit.setOnClickListener { checkAnswer() }
+        binding.btnClear.setOnClickListener { viewModel.clearAnswer() }
+        binding.btnBackspace.setOnClickListener { viewModel.backspace() }
+        binding.btnSubmit.setOnClickListener { viewModel.submitAnswer() }
     }
     
-    private fun generateMathProblem() {
-        // Generate simple math problems that require conscious thought
-        val operations = listOf("+", "-", "×")
-        val operation = operations.random()
-        
-        val (num1, num2, answer) = when (operation) {
-            "+" -> {
-                val a = Random.nextInt(10, 100)
-                val b = Random.nextInt(10, 100)
-                Triple(a, b, a + b)
+    private fun observeViewModel() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.uiState.collect { state ->
+                    updateUI(state)
+                }
             }
-            "-" -> {
-                val a = Random.nextInt(50, 200)
-                val b = Random.nextInt(10, a)
-                Triple(a, b, a - b)
-            }
-            "×" -> {
-                val a = Random.nextInt(2, 20)
-                val b = Random.nextInt(2, 20)
-                Triple(a, b, a * b)
-            }
-            else -> Triple(0, 0, 0)
+        }
+    }
+    
+    private fun updateUI(state: com.nonstop.alarm.ui.alarm.AlarmUiState) {
+        // Update time displays
+        binding.tvEndTime.text = if (state.endTimeDisplay.isNotEmpty()) {
+            "Alarm will stop automatically at ${state.endTimeDisplay}"
+        } else {
+            "Alarm active"
         }
         
-        currentAnswer = answer
-        binding.tvMathProblem.text = "$num1 $operation $num2 = ?"
-        binding.tvAnswerInput.text = ""
-    }
-    
-    private fun appendDigit(digit: String) {
-        val currentText = binding.tvAnswerInput.text.toString()
-        if (currentText.length < 6) { // Prevent extremely long inputs
-            binding.tvAnswerInput.text = currentText + digit
-        }
-    }
-    
-    private fun clearAnswer() {
-        binding.tvAnswerInput.text = ""
-    }
-    
-    private fun backspace() {
-        val currentText = binding.tvAnswerInput.text.toString()
-        if (currentText.isNotEmpty()) {
-            binding.tvAnswerInput.text = currentText.dropLast(1)
-        }
-    }
-    
-    private fun checkAnswer() {
-        val userInput = binding.tvAnswerInput.text.toString()
-        
-        if (userInput.isEmpty()) {
-            Toast.makeText(this, "Please enter an answer", Toast.LENGTH_SHORT).show()
-            return
+        // Update time remaining if available
+        if (state.timeRemainingDisplay.isNotEmpty()) {
+            // You might want to add a time remaining TextView to the layout
         }
         
-        try {
-            val userAnswer = userInput.toInt()
-            
-            if (userAnswer == currentAnswer) {
-                // Correct answer - stop the alarm
-                stopAlarm()
-                Toast.makeText(this, "Correct! Alarm dismissed.", Toast.LENGTH_SHORT).show()
-                finish()
-            } else {
-                // Wrong answer - generate new problem
-                Toast.makeText(this, "Incorrect. Try again with a new problem.", Toast.LENGTH_SHORT).show()
-                generateMathProblem()
-            }
-        } catch (e: NumberFormatException) {
-            Toast.makeText(this, "Please enter a valid number", Toast.LENGTH_SHORT).show()
+        // Update puzzle display
+        binding.tvMathProblem.text = state.puzzleText
+        binding.tvAnswerInput.text = state.userAnswer
+        
+        // Handle alarm dismissed
+        if (state.isAlarmDismissed) {
+            stopAlarm()
+            finish()
         }
+        
+        // Handle alarm expired
+        if (state.hasExpired) {
+            finish()
+        }
+        
+        // Show messages
+        state.error?.let { error ->
+            Toast.makeText(this, error, Toast.LENGTH_SHORT).show()
+            viewModel.clearError()
+        }
+        
+        state.message?.let { message ->
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+            viewModel.clearMessage()
+        }
+        
+        // Update button states
+        binding.btnSubmit.isEnabled = !state.isValidatingAnswer && state.userAnswer.isNotEmpty()
     }
     
     private fun stopAlarm() {
